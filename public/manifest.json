@@ -1,0 +1,26 @@
+{
+  "name": "Crypto Vision AI",
+  "short_name": "CryptoVision",
+  "description": "AI-Powered Crypto Market Intelligence — Real-time signals, charts, and predictions",
+  "start_url": "/",
+  "scope": "/",
+  "display": "fullscreen",
+  "orientation": "portrait-primary",
+  "theme_color": "#0a0f1e",
+  "background_color": "#0a0f1e",
+  "categories": ["finance", "utilities"],
+  "icons": [
+    {
+      "src": "/assets/generated/pwa-icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/generated/pwa-icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

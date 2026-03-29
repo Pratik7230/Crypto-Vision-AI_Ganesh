@@ -1,0 +1,258 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================
+   CRYPTOAI PREDICTOR — BINANCE/COINDCX DARK EXCHANGE THEME
+   OKLCH color tokens (raw L C H — no oklch() wrapper)
+   ===================================================== */
+
+@layer base {
+  :root {
+    --radius: 0.25rem;
+
+    /* Binance-inspired dark exchange palette */
+    --background: 0.10 0.005 240;
+    --foreground: 0.93 0.008 220;
+    --card: 0.135 0.007 240;
+    --card-foreground: 0.93 0.008 220;
+    --popover: 0.155 0.008 235;
+    --popover-foreground: 0.93 0.008 220;
+    /* Primary = Binance Yellow */
+    --primary: 0.82 0.16 88;
+    --primary-foreground: 0.1 0.01 88;
+    --secondary: 0.18 0.008 235;
+    --secondary-foreground: 0.85 0.008 220;
+    --muted: 0.155 0.008 235;
+    --muted-foreground: 0.55 0.012 225;
+    --accent: 0.20 0.01 235;
+    --accent-foreground: 0.93 0.008 220;
+    --destructive: 0.62 0.22 25;
+    --destructive-foreground: 0.98 0.01 0;
+    --border: 0.22 0.010 240;
+    --input: 0.20 0.008 240;
+    --ring: 0.82 0.16 88;
+
+    /* Semantic signal colors */
+    --signal-buy: 0.72 0.18 155;
+    --signal-sell: 0.62 0.22 25;
+    --signal-hold: 0.82 0.16 88;
+
+    /* Chart colors */
+    --chart-1: 0.82 0.16 88;
+    --chart-2: 0.72 0.18 155;
+    --chart-3: 0.82 0.16 75;
+    --chart-4: 0.62 0.22 25;
+    --chart-5: 0.68 0.18 260;
+
+    /* Sidebar */
+    --sidebar: 0.11 0.006 240;
+    --sidebar-foreground: 0.85 0.008 220;
+    --sidebar-primary: 0.82 0.16 88;
+    --sidebar-primary-foreground: 0.1 0.01 88;
+    --sidebar-accent: 0.18 0.008 235;
+    --sidebar-accent-foreground: 0.85 0.008 220;
+    --sidebar-border: 0.20 0.008 240;
+    --sidebar-ring: 0.82 0.16 88;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+    /* Prevent scroll bounce on iOS when installed as PWA */
+    overflow: hidden;
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "tnum" on, "lnum" on;
+    /* Prevent pull-to-refresh rubber banding in PWA standalone mode */
+    overscroll-behavior: none;
+    /* Remove iOS tap highlight on interactive elements */
+    -webkit-tap-highlight-color: transparent;
+    /* Ensure body fills the full dynamic viewport */
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* Smooth momentum scrolling for overflow containers on iOS */
+  .overflow-y-auto,
+  .overflow-y-scroll,
+  .overflow-auto,
+  .overflow-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: oklch(0.12 0.006 240);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.26 0.012 240);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.82 0.16 88 / 0.5);
+  }
+}
+
+@layer utilities {
+  .font-mono-nums {
+    font-family: "JetBrains Mono", "Geist Mono", monospace;
+    font-feature-settings: "tnum" on, "lnum" on;
+  }
+
+  /* Terminal color utilities — used in Login, Dashboard, AISignalFeed, etc. */
+  .text-terminal-cyan { color: oklch(0.78 0.18 174); }
+  .text-terminal-green { color: oklch(0.72 0.18 155); }
+  .text-terminal-red { color: oklch(0.65 0.22 25); }
+  .text-terminal-amber { color: oklch(0.82 0.18 75); }
+  .bg-terminal-cyan { background-color: oklch(0.78 0.18 174); }
+  .bg-terminal-green { background-color: oklch(0.72 0.18 155); }
+  .bg-terminal-red { background-color: oklch(0.65 0.22 25); }
+
+  /* Scanline effect — overlay repeating horizontal stripes for CRT look */
+  .scanline {
+    position: relative;
+  }
+  .scanline::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      oklch(0.07 0.005 240 / 0.03) 2px,
+      oklch(0.07 0.005 240 / 0.03) 4px
+    );
+    z-index: 1;
+  }
+
+  .text-signal-buy {
+    color: oklch(0.72 0.18 155);
+  }
+  .text-signal-sell {
+    color: oklch(0.65 0.22 25);
+  }
+  .text-signal-hold {
+    color: oklch(0.82 0.16 88);
+  }
+
+  .bg-signal-buy {
+    background-color: oklch(0.72 0.18 155 / 0.15);
+  }
+  .bg-signal-sell {
+    background-color: oklch(0.62 0.22 25 / 0.15);
+  }
+  .bg-signal-hold {
+    background-color: oklch(0.82 0.16 88 / 0.15);
+  }
+
+  .border-signal-buy {
+    border-color: oklch(0.72 0.18 155 / 0.4);
+  }
+  .border-signal-sell {
+    border-color: oklch(0.62 0.22 25 / 0.4);
+  }
+  .border-signal-hold {
+    border-color: oklch(0.82 0.16 88 / 0.4);
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 20px oklch(0.82 0.16 88 / 0.3);
+  }
+
+  .glow-buy {
+    box-shadow: 0 0 12px oklch(0.72 0.18 155 / 0.4);
+  }
+
+  .glow-sell {
+    box-shadow: 0 0 12px oklch(0.62 0.22 25 / 0.4);
+  }
+
+  /* Exchange row hover */
+  .exchange-row {
+    transition: background 0.12s ease;
+  }
+  .exchange-row:hover {
+    background: oklch(0.18 0.008 235);
+  }
+
+  /* Ticker strip */
+  .ticker-scroll {
+    animation: ticker 60s linear infinite;
+  }
+
+  /* Nav active state - yellow indicator */
+  .nav-active {
+    color: oklch(0.82 0.16 88);
+    background: oklch(0.82 0.16 88 / 0.08);
+  }
+
+  /* Binance-style green/red row tints */
+  .row-gain {
+    background: oklch(0.72 0.18 155 / 0.04);
+  }
+  .row-loss {
+    background: oklch(0.62 0.22 25 / 0.04);
+  }
+
+  .terminal-grid {
+    background-image:
+      linear-gradient(oklch(0.22 0.010 240 / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(0.22 0.010 240 / 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Flicker animation for the "AI signals" text on the login hero */
+@keyframes flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.85; }
+  97% { opacity: 1; }
+  98% { opacity: 0.9; }
+}
+
+/* Live candle pulse — last candle in chart blinks to indicate it's live */
+@keyframes candle-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+.animate-ticker { animation: ticker 60s linear infinite; }
+.animate-pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+.animate-sparkle { animation: sparkle 2.5s ease-in-out infinite; }
+.animate-flicker { animation: flicker 8s ease-in-out infinite; }
+.animate-candle-live { animation: candle-live 1.2s ease-in-out infinite; }
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  20% { transform: scale(1.4) rotate(45deg); opacity: 1; }
+  50% { transform: scale(0.8) rotate(90deg); opacity: 0.6; }
+  80% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
