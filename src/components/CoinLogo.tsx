@@ -67,6 +67,7 @@ export function CoinLogo({
           border: `1.5px solid ${color}40`,
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={getCdnUrl(symbol)}
           alt={symbol}

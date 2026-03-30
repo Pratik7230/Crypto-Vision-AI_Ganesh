@@ -29,7 +29,13 @@ interface TopHeaderProps {
   onMenuClick?: () => void;
 }
 
-function NotificationDropdown({ onClose }: { onClose: () => void }) {
+function NotificationDropdown({
+  onClose,
+  nowMs,
+}: {
+  onClose: () => void;
+  nowMs: number;
+}) {
   const notificationFeed = useAppStore((s) => s.notificationFeed);
   const markNotificationsRead = useAppStore((s) => s.markNotificationsRead);
 
@@ -38,7 +44,7 @@ function NotificationDropdown({ onClose }: { onClose: () => void }) {
   }, [markNotificationsRead]);
 
   const relativeTime = (ts: number) => {
-    const diff = Date.now() - ts;
+    const diff = nowMs - ts;
     if (diff < 60000) return `${Math.floor(diff / 1000)}s ago`;
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
     return `${Math.floor(diff / 3600000)}h ago`;
@@ -247,16 +253,17 @@ export function TopHeader({ onMenuClick }: TopHeaderProps) {
   const notificationFeed = useAppStore((s) => s.notificationFeed);
   const userSubscription = useAppStore((s) => s.userSubscription);
   const setActivePage = useAppStore((s) => s.setActivePage);
+  const clock = useLiveClock();
+  const nowMs = clock.getTime();
 
   const planBadge = (() => {
     const badge = getPlanBadgeStyle(userSubscription.plan);
     if (!badge) return null;
     // Only show if not expired
-    if (userSubscription.expiresAt && userSubscription.expiresAt <= Date.now())
+    if (userSubscription.expiresAt && userSubscription.expiresAt <= nowMs)
       return null;
     return badge;
   })();
-  const clock = useLiveClock();
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
@@ -319,6 +326,7 @@ export function TopHeader({ onMenuClick }: TopHeaderProps) {
 
       {/* Logo */}
       <div className="flex items-center gap-2.5 mr-2 shrink-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/generated/crypto-vision-ai-logo.svg"
           alt="Crypto Vision AI"
@@ -452,7 +460,10 @@ export function TopHeader({ onMenuClick }: TopHeaderProps) {
           </button>
 
           {showNotifications && (
-            <NotificationDropdown onClose={() => setShowNotifications(false)} />
+            <NotificationDropdown
+              onClose={() => setShowNotifications(false)}
+              nowMs={nowMs}
+            />
           )}
         </div>
 

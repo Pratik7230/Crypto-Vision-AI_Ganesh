@@ -42,6 +42,7 @@ export function AboutPage() {
       <div className="max-w-3xl mx-auto px-4 py-10 pb-24 md:pb-10">
         {/* Hero */}
         <div className="flex flex-col items-center text-center mb-12">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/generated/crypto-vision-ai-logo.svg"
             alt="Crypto Vision AI"
@@ -213,4 +214,6 @@ export function AboutPage() {
     </div>
   );
 }
+
+export default AboutPage;
 

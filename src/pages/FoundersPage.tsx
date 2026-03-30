@@ -14,6 +14,7 @@ export function FoundersPage() {
       <div className="flex flex-col items-center justify-center min-h-full px-4 py-12 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-12">
         {/* App Logo + Name */}
         <div className="flex flex-col items-center mb-10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/generated/crypto-vision-ai-logo.svg"
             alt="Crypto Vision AI"
@@ -121,4 +122,6 @@ export function FoundersPage() {
     </div>
   );
 }
+
+export default FoundersPage;
 

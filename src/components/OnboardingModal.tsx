@@ -173,6 +173,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
         <div className="p-8">
           {/* Logo + Welcome */}
           <div className="flex flex-col items-center gap-3 mb-8 text-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/assets/generated/crypto-vision-ai-logo.svg"
               alt="Crypto Vision AI"

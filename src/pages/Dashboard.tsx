@@ -123,6 +123,8 @@ function MarketSummary({
 
 export function Dashboard() {
   const { identity, clear } = useInternetIdentity();
+  const referralHost =
+    typeof window !== "undefined" ? window.location.hostname : "localhost";
   const principal = identity?.getPrincipal().toString() ?? "";
   const clock = useLiveClock();
 
@@ -155,9 +157,14 @@ export function Dashboard() {
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
 
   // Auto-refresh every 30s
-  const [lastRefresh, setLastRefresh] = useState(Date.now());
+  const [lastRefresh, setLastRefresh] = useState<number>(
+    () => signalFeed[0]?.timestamp ?? 0,
+  );
   const coinsRef = useRef(coins);
-  coinsRef.current = coins;
+
+  useEffect(() => {
+    coinsRef.current = coins;
+  }, [coins]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -219,6 +226,9 @@ export function Dashboard() {
     setSelectedCoin(null);
   }, []);
 
+  const lastRefreshLabel =
+    lastRefresh > 0 ? new Date(lastRefresh).toLocaleTimeString() : "--:--:--";
+
   const selectedSignal = selectedCoin
     ? (signals.get(selectedCoin.symbol) ?? null)
     : null;
@@ -245,6 +255,7 @@ export function Dashboard() {
       >
         {/* Logo */}
         <div className="flex items-center gap-2.5 mr-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/generated/crypto-vision-ai-logo.svg"
             alt="Crypto Vision AI"
@@ -332,7 +343,7 @@ export function Dashboard() {
                   Market Overview
                 </h1>
                 <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                  Last updated: {new Date(lastRefresh).toLocaleTimeString()} ·
+                  Last updated: {lastRefreshLabel} ·
                   Auto-refreshes every 30s
                 </p>
               </div>
@@ -442,7 +453,7 @@ export function Dashboard() {
       >
         © {new Date().getFullYear()}. Built with ♥ using{" "}
         <a
-          href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
+          href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(referralHost)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-terminal-cyan hover:underline"
@@ -453,4 +464,6 @@ export function Dashboard() {
     </div>
   );
 }
+
+export default Dashboard;
 

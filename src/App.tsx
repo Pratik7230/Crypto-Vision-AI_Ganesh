@@ -108,30 +108,37 @@ export default function App() {
     };
   }, []);
 
-  // Determine initial flow state once identity is known
-  useEffect(() => {
-    if (isInitializing) return;
-
-    if (!identity && !hasLocalAuthSession) {
-      setFlow("login");
-      return;
+  const resolvedFlow: AppFlow = (() => {
+    if (isInitializing) {
+      return "loading";
     }
 
-    // Check onboarding status
+    if (!identity && !hasLocalAuthSession) {
+      return "login";
+    }
+
+    if (flow === "congrats" || flow === "notif-prompt") {
+      return flow;
+    }
+
+    if (typeof window === "undefined") {
+      return "loading";
+    }
+
     const stored = localStorage.getItem("cvai_user_profile");
     if (stored) {
       try {
         const profile = JSON.parse(stored) as UserProfile;
         if (profile.onboardingComplete) {
-          setFlow("app");
-          return;
+          return "app";
         }
       } catch {
         // corrupt data, reset
       }
     }
-    setFlow("onboarding");
-  }, [isInitializing, identity, hasLocalAuthSession]);
+
+    return "onboarding";
+  })();
 
   // Track login record when identity first appears
   useEffect(() => {
@@ -169,13 +176,14 @@ export default function App() {
   }, [identity, addUserLoginRecord]);
 
   // Show loading screen while auth is initializing
-  if (isInitializing || flow === "loading") {
+  if (resolvedFlow === "loading") {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
         style={{ background: "oklch(0.10 0.005 240)" }}
       >
         <div className="flex flex-col items-center gap-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/generated/crypto-vision-ai-logo.svg"
             alt="Crypto Vision AI"
@@ -201,11 +209,11 @@ export default function App() {
     );
   }
 
-  if (flow === "login" || (!identity && !hasLocalAuthSession)) {
+  if (resolvedFlow === "login") {
     return <Login />;
   }
 
-  if (flow === "onboarding") {
+  if (resolvedFlow === "onboarding") {
     return (
       <OnboardingModal
         onComplete={(profile) => {
@@ -235,7 +243,7 @@ export default function App() {
     );
   }
 
-  if (flow === "congrats") {
+  if (resolvedFlow === "congrats") {
     const balance =
       pendingProfile?.demoBalance ??
       (() => {
@@ -269,7 +277,7 @@ export default function App() {
     );
   }
 
-  if (flow === "notif-prompt") {
+  if (resolvedFlow === "notif-prompt") {
     return <NotificationPermissionPrompt onClose={() => setFlow("app")} />;
   }
 

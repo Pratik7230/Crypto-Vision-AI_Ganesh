@@ -59,6 +59,8 @@ const TICKERS = [
 
 export function Login() {
   const { login, isLoggingIn, isInitializing } = useInternetIdentity();
+  const referralHost =
+    typeof window !== "undefined" ? window.location.hostname : "localhost";
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
   const [forgotMode, setForgotMode] = useState(false);
@@ -295,6 +297,7 @@ export function Login() {
         style={{ borderBottom: "1px solid oklch(0.18 0.01 235)" }}
       >
         <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/generated/crypto-vision-ai-logo.svg"
             alt="Crypto Vision AI Logo"
@@ -795,7 +798,7 @@ export function Login() {
                   </>
                 ) : activeTab === "signin" ? (
                   <>
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <button
                       type="button"
                       data-ocid="login.switch_to_signup.button"
@@ -918,7 +921,7 @@ export function Login() {
       >
         © {new Date().getFullYear()}. Built with love using{" "}
         <a
-          href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
+          href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(referralHost)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-terminal-cyan hover:underline"
@@ -929,4 +932,6 @@ export function Login() {
     </div>
   );
 }
+
+export default Login;
 

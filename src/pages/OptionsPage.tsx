@@ -1,5 +1,5 @@
 import { Crown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { formatPrice } from "../data/cryptoData";
 import { useAppStore } from "../store/appStore";
@@ -51,6 +51,11 @@ function getExpiry(expiry: Expiry): number {
   }
 }
 
+function seededUnit(seed: number): number {
+  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
 interface OptionRow {
   strike: number;
   callPrice: number;
@@ -80,6 +85,13 @@ export function OptionsPage() {
   const [orderSide, setOrderSide] = useState<"buy" | "sell">("buy");
   const [orderType, setOrderType] = useState<"market" | "limit">("market");
   const [qty, setQty] = useState("1");
+  const [clock, setClock] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setClock(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const nowMs = clock.getTime();
 
   const spotCoin = coins.find((c) => c.symbol === underlying);
   const S = spotCoin?.price ?? 67432;
@@ -96,8 +108,10 @@ export function OptionsPage() {
       return Math.round(raw / magnitude) * magnitude;
     });
 
-    return strikes.map((K) => {
-      const iv = sigma + (Math.random() - 0.5) * 0.1;
+    return strikes.map((K, idx) => {
+      const seedBase =
+        Math.round(K) + idx * 101 + Math.round(S) + Math.round(T * 10_000);
+      const iv = sigma + (seededUnit(seedBase + 1) - 0.5) * 0.1;
       const callPrice = Math.max(bsCall(S, K, T, r, iv), 0);
       const putPrice = Math.max(callPrice - S + K * Math.exp(-r * T), 0);
       const d1 =
@@ -113,15 +127,15 @@ export function OptionsPage() {
         callIV: iv * 100,
         callBid: callPrice - spread,
         callAsk: callPrice + spread,
-        callVol: Math.floor(Math.random() * 2000 + 100),
-        callOI: Math.floor(Math.random() * 10000 + 500),
+        callVol: Math.floor(seededUnit(seedBase + 2) * 2000 + 100),
+        callOI: Math.floor(seededUnit(seedBase + 3) * 10000 + 500),
         putPrice,
         putDelta,
         putIV: iv * 100,
         putBid: putPrice - putSpread,
         putAsk: putPrice + putSpread,
-        putVol: Math.floor(Math.random() * 2000 + 100),
-        putOI: Math.floor(Math.random() * 10000 + 500),
+        putVol: Math.floor(seededUnit(seedBase + 4) * 2000 + 100),
+        putOI: Math.floor(seededUnit(seedBase + 5) * 10000 + 500),
         itm: K < S,
       };
     });
@@ -146,10 +160,49 @@ export function OptionsPage() {
 
   const fmt = (n: number) => (n < 1 ? `$${n.toFixed(3)}` : `$${n.toFixed(2)}`);
 
+  const greekStats = selected
+    ? [
+        {
+          label: "Delta",
+          value: selected.callDelta.toFixed(3),
+          color: "oklch(0.72 0.18 155)",
+        },
+        {
+          label: "Gamma",
+          value: (
+            0.001 +
+            seededUnit(Math.round(selected.strike + S + T * 10_000) + 11) * 0.002
+          ).toFixed(4),
+          color: "oklch(0.82 0.16 88)",
+        },
+        {
+          label: "Theta",
+          value: `-${(
+            0.05 +
+            seededUnit(Math.round(selected.strike + S + T * 10_000) + 12) * 0.1
+          ).toFixed(3)}`,
+          color: "oklch(0.65 0.22 25)",
+        },
+        {
+          label: "Vega",
+          value: (
+            0.1 +
+            seededUnit(Math.round(selected.strike + S + T * 10_000) + 13) * 0.2
+          ).toFixed(3),
+          color: "oklch(0.78 0.18 174)",
+        },
+        {
+          label: "IV",
+          value: `${selected.callIV.toFixed(1)}%`,
+          color: "oklch(0.82 0.18 75)",
+        },
+      ]
+    : [];
+
   const showUpgradeBanner =
     userSubscription.plan === "free" ||
     (userSubscription.expiresAt !== null &&
-      userSubscription.expiresAt <= Date.now());
+      userSubscription.expiresAt <= nowMs);
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
@@ -457,33 +510,7 @@ export function OptionsPage() {
                   Greeks
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  {[
-                    {
-                      label: "Delta",
-                      value: selected.callDelta.toFixed(3),
-                      color: "oklch(0.72 0.18 155)",
-                    },
-                    {
-                      label: "Gamma",
-                      value: (0.001 + Math.random() * 0.002).toFixed(4),
-                      color: "oklch(0.82 0.16 88)",
-                    },
-                    {
-                      label: "Theta",
-                      value: `-${(0.05 + Math.random() * 0.1).toFixed(3)}`,
-                      color: "oklch(0.65 0.22 25)",
-                    },
-                    {
-                      label: "Vega",
-                      value: (0.1 + Math.random() * 0.2).toFixed(3),
-                      color: "oklch(0.78 0.18 174)",
-                    },
-                    {
-                      label: "IV",
-                      value: `${selected.callIV.toFixed(1)}%`,
-                      color: "oklch(0.82 0.18 75)",
-                    },
-                  ].map(({ label, value, color }) => (
+                  {greekStats.map(({ label, value, color }) => (
                     <div key={label} className="flex justify-between">
                       <span className="text-muted-foreground">{label}</span>
                       <span className="font-semibold" style={{ color }}>
@@ -666,3 +693,5 @@ export function OptionsPage() {
     </div>
   );
 }
+
+export default OptionsPage;

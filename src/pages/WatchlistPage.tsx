@@ -302,3 +302,5 @@ export function WatchlistPage() {
     </div>
   );
 }
+
+export default WatchlistPage;

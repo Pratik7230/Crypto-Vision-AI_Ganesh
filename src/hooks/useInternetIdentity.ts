@@ -280,8 +280,5 @@ export function InternetIdentityProvider({
     [identity, login, clear, loginStatus, loginError],
   );
 
-  return createElement(InternetIdentityReactContext.Provider, {
-    value,
-    children,
-  });
+  return createElement(InternetIdentityReactContext.Provider, { value }, children);
 }

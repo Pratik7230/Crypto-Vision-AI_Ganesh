@@ -184,6 +184,7 @@ export function SideNav() {
 
             {/* App name */}
             <div className="flex items-center gap-2 mb-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/assets/generated/crypto-vision-ai-logo.svg"
                 alt="Crypto Vision AI"

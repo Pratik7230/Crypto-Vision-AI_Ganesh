@@ -497,14 +497,16 @@ export function IntradayPage() {
     generateTrades(basePrice, 20),
   );
 
-  // Reset on symbol change
-  useEffect(() => {
-    const newBasePrice =
-      coins.find((c) => c.symbol === symbol)?.price ?? basePrice;
-    priceRef.current = newBasePrice;
-    setCandles(generateCandles(newBasePrice, 390, 1, 0.006));
-    setTrades(generateTrades(newBasePrice, 20));
-  }, [symbol, coins, basePrice]);
+  const resetSeriesForSymbol = useCallback(
+    (nextSymbol: Symbol) => {
+      const newBasePrice =
+        coins.find((c) => c.symbol === nextSymbol)?.price ?? basePrice;
+      priceRef.current = newBasePrice;
+      setCandles(generateCandles(newBasePrice, 390, 1, 0.006));
+      setTrades(generateTrades(newBasePrice, 20));
+    },
+    [coins, basePrice],
+  );
 
   // Update last candle every 3s
   useEffect(() => {
@@ -570,6 +572,13 @@ export function IntradayPage() {
 
   const estimatedCost = Number.parseFloat(amount || "0") * leverage;
 
+  const [clock, setClock] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setClock(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const nowMs = clock.getTime();
+
   const handleTrade = useCallback(() => {
     toast.success(
       `${tradeSide.toUpperCase()} ${symbol} — ${leverage}x Leverage`,
@@ -582,7 +591,7 @@ export function IntradayPage() {
   const showUpgradeBanner =
     userSubscription.plan === "free" ||
     (userSubscription.expiresAt !== null &&
-      userSubscription.expiresAt <= Date.now());
+      userSubscription.expiresAt <= nowMs);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -650,7 +659,10 @@ export function IntradayPage() {
             <button
               key={s}
               type="button"
-              onClick={() => setSymbol(s)}
+              onClick={() => {
+                setSymbol(s);
+                resetSeriesForSymbol(s);
+              }}
               data-ocid="intraday.tab"
               className="px-2.5 py-1 text-xs font-mono rounded transition-colors"
               style={
@@ -994,3 +1006,5 @@ export function IntradayPage() {
     </div>
   );
 }
+
+export default IntradayPage;

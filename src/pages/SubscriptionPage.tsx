@@ -1,5 +1,6 @@
 import { Check, Crown, Sparkles, Zap } from "lucide-react";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { type SubscriptionPlan, useAppStore } from "../store/appStore";
 
@@ -126,12 +127,19 @@ export function SubscriptionPage() {
   const userSubscription = useAppStore((s) => s.userSubscription);
   const setSubscription = useAppStore((s) => s.setSubscription);
   const setActivePage = useAppStore((s) => s.setActivePage);
+  const [clock, setClock] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setClock(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const nowMs = clock.getTime();
 
   const isActive = (plan: SubscriptionPlan) => {
     if (userSubscription.plan !== plan) return false;
     if (plan === "free") return true;
     if (!userSubscription.expiresAt) return false;
-    return userSubscription.expiresAt > Date.now();
+    return userSubscription.expiresAt > nowMs;
   };
 
   const handleSubscribe = (plan: PlanConfig) => {
@@ -152,7 +160,7 @@ export function SubscriptionPage() {
       {/* Active plan banner */}
       {userSubscription.plan !== "free" &&
         userSubscription.expiresAt &&
-        userSubscription.expiresAt > Date.now() && (
+        userSubscription.expiresAt > nowMs && (
           <motion.div
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -554,3 +562,5 @@ export function SubscriptionPage() {
     </div>
   );
 }
+
+export default SubscriptionPage;

@@ -379,3 +379,5 @@ export function MarketsPage() {
     </div>
   );
 }
+
+export default MarketsPage;
